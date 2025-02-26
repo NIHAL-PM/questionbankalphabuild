@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitive Exam Question Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Competitive Exam Practice</h1>
+        <div id="question-box">
+            <p id="question-text">Click "Next Question" to start!</p>
+            <ul id="options-list"></ul>
+            <p id="answer-text" class="hidden"></p>
+        </div>
+        <div class="buttons">
+            <button onclick="fetchQuestion()">Next Question</button>
+            <button onclick="showAnswer()" id="show-answer-btn">Show Answer</button>
+        </div>
+    </div>
+
+    <script>
+        function fetchQuestion() {
+            fetch('/get_question')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    document.getElementById('question-text').textContent = data.question;
+                    const optionsList = document.getElementById('options-list');
+                    optionsList.innerHTML = ''; // Clear previous options
+                    data.options.forEach(option => {
+                        const li = document.createElement('li');
+                        li.textContent = option;
+                        optionsList.appendChild(li);
+                    });
+                    document.getElementById('answer-text').textContent = `Correct Answer: ${data.options[data.answer.charCodeAt(0) - 65]}`;
+                    document.getElementById('answer-text').classList.add('hidden');
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function showAnswer() {
+            const answerText = document.getElementById('answer-text');
+            answerText.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
